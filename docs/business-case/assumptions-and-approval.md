@@ -6,7 +6,7 @@
 **Approval Date:** 03 November 2026  
 **Approver:** Project owner (independent portfolio project)  
 **Decision:** Conditionally approved — subject to documenting the consolidated assumptions register  
-**Affiliation:** Independent educational portfolio project; not affiliated with mobile.de
+**Affiliation:** Independent educational portfolio project.
 
 ## 1. Purpose
 
@@ -55,9 +55,9 @@ The assumptions are hypotheses for a fictional marketplace, not verified finding
 
 **Approval scope:** Independent AutoConnect MVP covering synthetic customer data, SQL audience segmentation, one re-engagement journey, an AI campaign operations assistant, human approval and prototype testing.
 
-**Not approved:** Production deployment, use of real marketplace customer data, autonomous customer messaging or claims of affiliation with mobile.de.
+**Not approved:** Production deployment, use of real customer data, autonomous customer messaging or claims of affiliation with any real organisation.
 
-**Approval status:** Conditional approval recorded; documentation condition pending verification.
+**Approval status:** Approved — assumptions register documented and approval conditions satisfied on 03 November 2026.
 
 ## 6. Next Gate
 
