@@ -4,7 +4,7 @@
 **Journey:** Saved-Search Re-engagement  
 **Version:** 1.0  
 **Date:** 03 November 2026  
-**Status:** Draft for project-owner approval  
+**Status:** Approved by project owner — 03 November 2026
 **Project type:** Independent portfolio prototype  
 **Data:** Synthetic only
 
