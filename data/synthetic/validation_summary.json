@@ -1,0 +1,26 @@
+{
+  "reference_timestamp": "2026-11-03 19:00:00",
+  "table_counts": {
+    "customers": 80,
+    "saved_searches": 80,
+    "browsing_events": 65,
+    "consents": 80,
+    "consent_history": 90,
+    "campaign_events": 5,
+    "raw_customer_staging": 15
+  },
+  "scenario_counts": {
+    "boundary": 5,
+    "inactive_eligible": 20,
+    "inactive_search": 10,
+    "no_browsing_eligible": 10,
+    "no_browsing_recent": 5,
+    "opted_out": 10,
+    "recently_active": 15,
+    "recently_contacted": 5
+  },
+  "expected_eligible_count": 35,
+  "foreign_key_check": "passed",
+  "consent_history_consistency": "passed",
+  "note": "Expected outcomes are scenario fixtures; validate them independently in T07/T08 SQL."
+}

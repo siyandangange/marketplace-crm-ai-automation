@@ -1,0 +1,16 @@
+staging_id,source_customer_id,first_name,last_name,email,country,imported_at,source_system
+1,EXT001,Lena,Weber,lena@example.com,Germany,2026-11-02 19:00:00,synthetic_import
+2,EXT002,Lena,Weber,lena@example.com,Germany,2026-11-02 19:00:00,synthetic_import
+3,EXT003,Missing,Email,,Germany,2026-11-02 19:00:00,synthetic_import
+4,EXT004,Malformed,Email,invalid-email,Germany,2026-11-02 19:00:00,synthetic_import
+5,EXT005,Case,Difference,LENA@EXAMPLE.COM,Germany,2026-11-02 19:00:00,synthetic_import
+6,EXT006,Spaces,Around, lena@example.com ,Germany,2026-11-02 19:00:00,synthetic_import
+7,EXT007,Blank,Email,,Germany,2026-11-02 19:00:00,synthetic_import
+8,EXT008,NoAt,Symbol,person.example.com,Germany,2026-11-02 19:00:00,synthetic_import
+9,EXT009,DoubleAt,Symbol,a@@example.com,Germany,2026-11-02 19:00:00,synthetic_import
+10,EXT010,Duplicate,Customer,dupe@example.com,Germany,2026-11-02 19:00:00,synthetic_import
+11,EXT011,Duplicate,Customer,dupe@example.com,Germany,2026-11-02 19:00:00,synthetic_import
+12,EXT012,Valid,Contact,valid12@example.com,Germany,2026-11-02 19:00:00,synthetic_import
+13,EXT013,Other,Valid,valid13@example.com,Germany,2026-11-02 19:00:00,synthetic_import
+14,EXT014,NoDomain,Contact,person@,Germany,2026-11-02 19:00:00,synthetic_import
+15,EXT015,Other,Valid,valid15@example.com,Germany,2026-11-02 19:00:00,synthetic_import
