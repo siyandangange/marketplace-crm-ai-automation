@@ -74,3 +74,18 @@ ON browsing_events(customer_id, occurred_at);
 
 CREATE INDEX IF NOT EXISTS idx_campaign_events_customer_date
 ON campaign_events(customer_id, occurred_at);
+
+-- 6. Raw customer staging data
+-- Deliberately allows missing and duplicate emails
+-- for synthetic CRM data-quality testing.
+
+CREATE TABLE IF NOT EXISTS raw_customer_staging (
+    staging_id INTEGER PRIMARY KEY,
+    source_customer_id TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT,
+    country TEXT,
+    imported_at TEXT NOT NULL,
+    source_system TEXT NOT NULL
+);
