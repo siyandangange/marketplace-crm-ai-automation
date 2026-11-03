@@ -89,3 +89,23 @@ CREATE TABLE IF NOT EXISTS raw_customer_staging (
     imported_at TEXT NOT NULL,
     source_system TEXT NOT NULL
 );
+
+-- 7. Marketing consent history
+-- Records changes to customer consent over time.
+-- The consents table stores the current preference.
+
+CREATE TABLE IF NOT EXISTS consent_history (
+    consent_history_id INTEGER PRIMARY KEY,
+    customer_id INTEGER NOT NULL,
+    channel TEXT NOT NULL,
+    status TEXT NOT NULL
+        CHECK (status IN ('opted_in', 'opted_out')),
+    changed_at TEXT NOT NULL,
+    source_system TEXT NOT NULL,
+    FOREIGN KEY (customer_id)
+        REFERENCES customers(customer_id)
+);
+
+-- Support retrieval of the latest consent change
+CREATE INDEX IF NOT EXISTS idx_consent_history_customer_channel_date
+ON consent_history(customer_id, channel, changed_at);
