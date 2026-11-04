@@ -1,0 +1,36 @@
+customer_id,first_name,email,vehicle_make,vehicle_model
+1,Lena,lena@example.com,Volkswagen,Golf
+4,Ben,ben@example.com,Toyota,Yaris
+7,Test007,autoconnect.customer007@example.com,Volkswagen,Golf
+8,Test008,autoconnect.customer008@example.com,BMW,3 Series
+9,Test009,autoconnect.customer009@example.com,Audi,A3
+10,Test010,autoconnect.customer010@example.com,Toyota,Yaris
+11,Test011,autoconnect.customer011@example.com,Opel,Corsa
+12,Test012,autoconnect.customer012@example.com,Ford,Focus
+13,Test013,autoconnect.customer013@example.com,Skoda,Octavia
+14,Test014,autoconnect.customer014@example.com,Hyundai,i30
+15,Test015,autoconnect.customer015@example.com,Volkswagen,Golf
+16,Test016,autoconnect.customer016@example.com,BMW,3 Series
+17,Test017,autoconnect.customer017@example.com,Audi,A3
+18,Test018,autoconnect.customer018@example.com,Toyota,Yaris
+19,Test019,autoconnect.customer019@example.com,Opel,Corsa
+20,Test020,autoconnect.customer020@example.com,Ford,Focus
+21,Test021,autoconnect.customer021@example.com,Skoda,Octavia
+22,Test022,autoconnect.customer022@example.com,Hyundai,i30
+23,Test023,autoconnect.customer023@example.com,Volkswagen,Golf
+24,Test024,autoconnect.customer024@example.com,BMW,3 Series
+57,Test057,autoconnect.customer057@example.com,Audi,A3
+58,Test058,autoconnect.customer058@example.com,Toyota,Yaris
+59,Test059,autoconnect.customer059@example.com,Opel,Corsa
+60,Test060,autoconnect.customer060@example.com,Ford,Focus
+61,Test061,autoconnect.customer061@example.com,Skoda,Octavia
+62,Test062,autoconnect.customer062@example.com,Hyundai,i30
+63,Test063,autoconnect.customer063@example.com,Volkswagen,Golf
+64,Test064,autoconnect.customer064@example.com,BMW,3 Series
+65,Test065,autoconnect.customer065@example.com,Audi,A3
+66,Test066,autoconnect.customer066@example.com,Toyota,Yaris
+76,Test076,autoconnect.customer076@example.com,Ford,Focus
+77,Test077,autoconnect.customer077@example.com,Skoda,Octavia
+78,Test078,autoconnect.customer078@example.com,Hyundai,i30
+79,Test079,autoconnect.customer079@example.com,Volkswagen,Golf
+80,Test080,autoconnect.customer080@example.com,BMW,3 Series
