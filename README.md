@@ -156,6 +156,14 @@ The business requirements and MVP journey have been approved. Implementation is 
 - [Business Discovery & Requirements](docs/discovery-and-requirements.md)
 - [MVP Journey Specification](docs/journey-specification.md)
 - [Local SQLite Setup](docs/setup.md)
+- ## Phase 04 — CRM Journey Automation (Completed)
+
+Implemented a saved-search re-engagement workflow in Brevo with email subscription checks, CRM attribute personalisation and controlled test delivery.
+
+- [Implementation and test results](docs/brevo-journey-implementation.md)
+- [Workflow and test evidence](docs/evidence/phase-04/)
+
+The workflow remains inactive. SQL eligibility and frequency controls are implemented separately and are not yet integrated with Brevo.
 
 ## Project Governance & Data Privacy
 
