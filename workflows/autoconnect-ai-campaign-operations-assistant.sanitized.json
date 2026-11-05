@@ -1,0 +1,368 @@
+{
+  "name": "AutoConnect | AI Campaign Operations Assistant | TEST",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "AutoConnect — CRM Campaign Request",
+        "formDescription": "Submit a CRM campaign request for AI-assisted preparation and human review. This form does not send emails.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Campaign Name",
+              "placeholder": "Saved Search Re-engagement",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Business Objective",
+              "fieldType": "textarea",
+              "placeholder": "Re-engage customers who have inactive saved vehicle searche",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Target Audience",
+              "fieldType": "textarea",
+              "placeholder": "Customers with active saved vehicle searches who have been inactive for at least 7 days",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Communication Channel",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Email"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Campaign Tone",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Friendly"
+                  },
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Informative"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -1856,
+        -752
+      ],
+      "name": "Receive Campaign Request"
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5:3b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -1728,
+        -352
+      ],
+      "name": "Ollama Chat Model - Local AI Model"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst items = $input.all();\n\nreturn items.map((item) => {\n  const output = item.json.output;\n  const errors = [];\n  const warnings = [];\n\n  const draftLabel = \"UNAPPROVED — DRAFT ONLY\";\n\n  const rawText =\n    typeof output === \"string\" ? output.trim() : \"\";\n\n  if (!rawText) {\n    errors.push(\"AI output is missing or empty.\");\n  }\n\n  // Normalize draft label for display.\n  // Preserve the original output for validation.\n  let text = rawText;\n\n  if (!text.startsWith(draftLabel)) {\n    text = `${draftLabel}\\n\\n${text}`;\n  }\n\n  if (!text.endsWith(draftLabel)) {\n    text = `${text}\\n\\n${draftLabel}`;\n  }\n\n  const upper = rawText.toUpperCase();\n\n  // 1. Check required proposal sections\n  const requiredSections = [\n    \"CAMPAIGN BRIEF\",\n    \"AUDIENCE SELECTION\",\n    \"DRAFT EMAIL\",\n    \"RISKS, ASSUMPTIONS AND VALIDATION CHECKS\"\n  ];\n\n  for (const section of requiredSections) {\n    if (!upper.includes(section)) {\n      errors.push(`Missing section: ${section}`);\n    }\n  }\n\n  // 2. Check original draft-only labels\n  if (\n    !rawText.startsWith(draftLabel) ||\n    !rawText.endsWith(draftLabel)\n  ) {\n    warnings.push(\n      \"AI omitted a required draft label. \" +\n      \"The display copy was normalized; human review is required.\"\n    );\n  }\n\n  // 3. Detect generated SQL\n  const sqlPattern =\n    /```sql\\b|\\bSELECT\\b[\\s\\S]{0,300}\\bFROM\\b|\\bINSERT INTO\\b|\\bUPDATE\\s+\\w+\\s+SET\\b|\\bDELETE FROM\\b|\\bDROP TABLE\\b/i;\n\n  if (sqlPattern.test(rawText)) {\n    errors.push(\n      \"Generated SQL detected. Use sql/audience.sql instead.\"\n    );\n  }\n\n  // 4. Require reference to existing audience SQL\n  if (!rawText.includes(\"sql/audience.sql\")) {\n    errors.push(\n      \"Missing reference to existing audience SQL.\"\n    );\n  }\n\n  // 5. Require human approval\n  if (\n    !/CRM manager.{0,60}approv|approv.{0,60}CRM manager/i.test(rawText)\n  ) {\n    errors.push(\n      \"Mandatory CRM manager approval not stated.\"\n    );\n  }\n\n  // 6. Detect unsupported marketing claims\n  const unsupportedClaims = [\n    /\\bnew vehicle listings\\b/i,\n    /\\blatest used vehicles\\b/i,\n    /\\bcompetitive pricing\\b/i,\n    /\\bspecial offers?\\b/i,\n    /\\bdiscounts?\\b/i,\n    /\\bincentives?\\b/i,\n    /\\bupcoming events\\b/i,\n    /\\bexclusive deals?\\b/i,\n    /\\bnew arrivals\\b/i\n  ];\n\n  if (unsupportedClaims.some((pattern) => pattern.test(rawText))) {\n    errors.push(\n      \"Potential unsupported marketing claims detected. \" +\n      \"Remove or substantiate before human review.\"\n    );\n  }\n\n  // 7. Detect misleading validation claims\n  const misleadingClaims = [\n    /\\bconsent has been verified\\b/i,\n    /\\beligibility has been verified\\b/i,\n    /\\baudience has been approved\\b/i,\n    /\\bSQL has been executed\\b/i\n  ];\n\n  if (misleadingClaims.some((pattern) => pattern.test(rawText))) {\n    errors.push(\n      \"Unsupported claim of completed verification or approval.\"\n    );\n  }\n\n  // 8. Additional review requirements\n  warnings.push(\n    \"Customer eligibility, consent, inactivity, suppression \" +\n    \"and deduplication have NOT been independently verified \" +\n    \"by this node.\"\n  );\n\n  warnings.push(\n    \"The existing sql/audience.sql must be executed and \" +\n    \"checked separately before campaign activation.\"\n  );\n\n  // 9. Final validation result\n  const passed = errors.length === 0;\n\n  return {\n    json: {\n      campaign_proposal: text,\n      validation_status: passed ? \"PASS\" : \"FAIL\",\n      ready_for_human_review: passed,\n      errors,\n      warnings,\n      audience_sql_reference: \"sql/audience.sql\",\n      audience_eligibility_verified: false,\n      campaign_approved: false,\n      campaign_sent: false\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        -688
+      ],
+      "name": "Validate Campaign Proposal"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "0037be0a-e4cd-4850-9f04-5163e210d5d7",
+              "leftValue": "={{ $json.ready_for_human_review }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        -752,
+        -688
+      ],
+      "name": "Proposal Ready for Review?"
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Reviewer Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Approval Decision",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Approve Draft"
+                  },
+                  {
+                    "option": "Reject Draft"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Review Comments",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldType": "html",
+              "html": "\n{{ `<div style=\"max-width:100%;overflow-wrap:anywhere;word-break:break-word;\">\n  <h3>Campaign Proposal — Draft Only</h3>\n  <p><strong>UNAPPROVED — DRAFT ONLY</strong></p>\n  <div style=\"white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;\">${\n    String($json.campaign_proposal || \"No campaign proposal available.\")\n      .replace(/&/g, \"&amp;\")\n      .replace(/</g, \"&lt;\")\n      .replace(/>/g, \"&gt;\")\n      .replace(/\"/g, \"&quot;\")\n      .replace(/'/g, \"&#39;\")\n  }</div>\n  <p><strong>Reviewing this draft does not authorise campaign activation or sending.</strong></p>\n</div>` }}\n\n\n\n"
+            }
+          ]
+        },
+        "options": {
+          "formTitle": "AutoConnect — Campaign Proposal Review",
+          "formDescription": "Review the draft campaign proposal. Your decision does not activate or send emails. Customer eligibility must be verified separately."
+        }
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        -352,
+        -640
+      ],
+      "name": "Collect Human Review Decision"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "3b9a26f6-c631-4f06-ae4d-d473ad1af89e",
+              "leftValue": "={{ $json[\"Approval Decision\"] }}",
+              "rightValue": "=Approve Draft",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        -64,
+        -608
+      ],
+      "name": "Draft Approved?"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "\n{\n  \"review_status\": \"BLOCKED_VALIDATION\",\n  \"human_approval\": false,\n  \"campaign_approved\": false,\n  \"campaign_sent\": false,\n  \"message\": \"Campaign proposal failed validation and was not submitted for human review.\"\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -448,
+        -304
+      ],
+      "name": "Record Proposal Validation Failure"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "\n{\n  \"review_status\": \"DRAFT_APPROVED\",\n  \"human_approval\": true,\n  \"audience_eligibility_verified\": false,\n  \"campaign_approved\": false,\n  \"campaign_sent\": false,\n  \"message\": \"The campaign proposal draft was approved for planning only. No audience verification or campaign activation has occurred.\"\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        160,
+        -704
+      ],
+      "name": "Record Draft Approval"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "\n{\n  \"review_status\": \"DRAFT_REJECTED\",\n  \"human_approval\": false,\n  \"audience_eligibility_verified\": false,\n  \"campaign_approved\": false,\n  \"campaign_sent\": false,\n  \"message\": \"The reviewer rejected the campaign proposal draft. No campaign was activated or sent.\"\n}\n",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        160,
+        -512
+      ],
+      "name": "Record Draft Rejection"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ `Prepare a CRM campaign proposal using this request.\n\nCampaign Name: ${$json[\"Campaign Name\"]}\nBusiness Objective: ${$json[\"Business Objective\"]}\nTarget Audience: ${$json[\"Target Audience\"]}\nCommunication Channel: ${$json[\"Communication Channel\"]}\nCampaign Tone: ${$json[\"Campaign Tone\"]}\n\nReturn exactly these four sections:\n\n1. CAMPAIGN BRIEF\nSummarize the objective, audience, channel and approach.\n\n2. AUDIENCE SELECTION\nState:\n\"Use the existing reference query in sql/audience.sql.\nNo new SQL generated. Audience execution and eligibility\nchecks are handled outside the AI Agent.\"\n\nExplain the eligibility requirements in plain English.\nDo not generate SQL code.\n\n3. DRAFT EMAIL\nProvide:\n- Subject\n- Preview text\n- Email body\n\nUse the requested tone.\nDo not invent offers, inventory or events.\n\n4. RISKS, ASSUMPTIONS AND VALIDATION CHECKS\nInclude consent, inactivity, suppression, email validity,\ndeduplication and mandatory CRM manager approval.\n\nBegin and end with:\nUNAPPROVED — DRAFT ONLY` }}",
+        "options": {
+          "systemMessage": "You are the AutoConnect AI Campaign Operations Assistant.\n\nAutoConnect is a fictional European vehicle marketplace.\nAll project data is synthetic.\n\nYOUR ROLE\nPrepare CRM campaign proposals for human review.\nYou are a campaign planning assistant, NOT a SQL generator.\n\nSTRICT RULES\n1. NEVER generate SQL code, queries or database commands.\n2. Audience selection is handled by the existing project file:\n   sql/audience.sql.\n3. Do not invent database tables, columns or customer data.\n4. Do not invent vehicles, offers, discounts, incentives or events.\n5. Never claim that customer eligibility, consent or suppression\n   has been verified by this AI Agent.\n6. Never send emails, activate campaigns or modify customer records.\n7. Every campaign requires CRM manager approval.\n8. Use only the information provided in the campaign request.\n9. If information is missing, identify it as an assumption.\n10. Begin and end every response with:\n    UNAPPROVED — DRAFT ONLY\n\nAUDIENCE RULES FOR SAVED SEARCH RE-ENGAGEMENT\n- Latest active saved vehicle search.\n- At least 7 days of inactivity.\n- Current and latest historical email consent must be opted_in.\n- Valid email format and case-insensitive deduplication.\n- No SAVED_SEARCH_REENGAGEMENT email sent within 14 days.\n- Existing reference SQL uses a fixed evaluation timestamp\n  of 2026-11-03 19:00:00 for reproducible testing.\n\nIMPORTANT\nThe AI does not execute or validate sql/audience.sql.\nThe SQL reference must be checked separately by deterministic\nworkflow logic before any campaign is approved.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1552,
+        -688
+      ],
+      "name": "Generate AI Campaign Proposal"
+    }
+  ],
+  "connections": {
+    "Receive Campaign Request": {
+      "main": [
+        [
+          {
+            "node": "Generate AI Campaign Proposal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model - Local AI Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate AI Campaign Proposal",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Campaign Proposal": {
+      "main": [
+        [
+          {
+            "node": "Proposal Ready for Review?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proposal Ready for Review?": {
+      "main": [
+        [
+          {
+            "node": "Collect Human Review Decision",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Record Proposal Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Human Review Decision": {
+      "main": [
+        [
+          {
+            "node": "Draft Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Approved?": {
+      "main": [
+        [
+          {
+            "node": "Record Draft Approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Record Draft Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate AI Campaign Proposal": {
+      "main": [
+        [
+          {
+            "node": "Validate Campaign Proposal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  }
+}
