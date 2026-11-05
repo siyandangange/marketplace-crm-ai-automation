@@ -2,9 +2,9 @@
 
 **Project:** AI-Powered CRM Lifecycle Automation  
 **Type:** Independent educational portfolio prototype for a fictional European vehicle marketplace  
-**Version:** 1.0 — SQL phase (T01–T09)  
+**Version:** 1.1 — SQL baseline plus subsequent implementation notes  
 **Recorded:** 04 November 2026  
-**Status:** Documentation of implemented work; Brevo and later AI/integration work pending  
+**Status:** SQL baseline preserved; Phase 04 and Phase 05 addendum recorded below  
 **Data:** Entirely synthetic
 
 ## 1. Purpose and evidence standard
@@ -99,7 +99,7 @@ T09 exports only `customer_id`, `first_name`, `email`, `vehicle_make`, `vehicle_
 6. **AI and integrations:** Treat n8n, API integrations and AI-assisted campaign preparation as planned until implemented and evidenced. Require human review of generated SQL and content.
 7. **Documentation maintenance:** Update the README progress table and the data-model status to reflect completed T01–T09; preserve evidence links and clearly label future work.
 
-## 8. Next milestone and safety gate
+## 8. Original SQL-phase milestone and safety gate
 
 **T10–T13:** Set up Brevo test attributes and a controlled saved-search re-engagement journey. Do **not** import the 35 `example.com` addresses as sendable contacts. Prepare a separate list using only email addresses owned and approved by the project owner; document mappings, journey configuration, consent/frequency checks and an authorised test send. Account limitations may require a documented simulation rather than claiming an unsupported live automation.
 
@@ -108,3 +108,31 @@ T09 exports only `customer_id`, `first_name`, `email`, `vehicle_make`, `vehicle_
 ---
 
 **Portfolio disclaimer:** AutoConnect is an independent educational project for a fictional marketplace. Its scenarios, stakeholders, datasets and test outcomes are synthetic. The work is not evidence of deployment to a real customer environment.
+
+## 9. Subsequent implementation update — 05 November 2026
+
+The preceding sections preserve the original **T01–T09 SQL-phase** assessment as a historical snapshot. Statements in those sections describing Brevo and n8n as future work should be read in that original context, not as the current overall project status.
+
+### Phase 04 — Brevo (T10–T13)
+
+A test-only Brevo saved-search re-engagement journey was configured with custom contact attributes, a subscribed test contact at an author-owned address, a subscription split and a personalised email. An **editor test email** was delivered successfully. This does not establish a live end-to-end automation run. The Brevo workflow remains inactive. See [Brevo journey implementation](brevo-journey-implementation.md).
+
+### Phase 05 — AI Campaign Operations Assistant (T14–T18)
+
+An n8n workflow now accepts structured campaign requests, uses a locally hosted Ollama model to generate draft campaign proposals, applies proposal-level JavaScript checks and routes passing drafts to a human review form. Tests demonstrated both **Approve Draft** and **Reject Draft** paths. Approval records `DRAFT_APPROVED` and `human_approval: true`, but deliberately keeps `audience_eligibility_verified`, `campaign_approved` and `campaign_sent` all **false**. Rejection also leaves all three false.
+
+**Implemented safeguards:** Draft-only labels and review warnings; human decision recorded; no Brevo sending or campaign activation node; AI-generated SQL not executed. The AI refers to the existing `sql/audience.sql` query as an eligibility reference.
+
+**Not implemented or independently proven:** Runtime connection from n8n to the SQLite database; deterministic re-evaluation of individual customers' consent, inactivity, suppression and deduplication inside the assistant; full negative-case validation suite; a REQUEST_REVISION branch; end-to-end Brevo campaign execution; production-grade audit persistence; or a Model Context Protocol (MCP) server providing dynamic brand context.
+
+**Interpretation:** This is a working **AI-assisted campaign proposal and human draft-review prototype**, not an autonomous campaign launch or an integrated consent-verification engine. Its review gate does not substitute for actual audience eligibility checks before any future send.
+
+See [AI agent specification and implementation](agent_spec.md). Exported n8n workflow JSON and sanitized screenshots remain to be added as repository evidence.
+
+### Next engineering priorities
+
+1. Preserve and upload sanitized workflow JSON and approval/rejection evidence.
+2. Test invalid campaign requests and confirm the validation-failure branch behaves as designed.
+3. Optionally implement the missing REQUEST_REVISION path.
+4. If integrating actual audience selection later, execute the established deterministic SQL independently of the language model and recheck eligibility before any permitted test send.
+5. Consider brand-context retrieval (potentially via MCP) only as a future enhancement; do not describe it as currently connected.
