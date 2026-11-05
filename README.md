@@ -61,17 +61,17 @@ The proposed journey includes audience preparation, personalised email content, 
 
 ### 4. AI-Assisted Campaign Operations
 
-Develop an n8n workflow to support CRM campaign preparation.
+A local n8n/Ollama prototype supports AI-assisted campaign proposal preparation and human draft review.
 
-Planned capabilities include:
+Demonstrated capabilities include:
 
 - Structured campaign requests
 - AI-generated campaign briefs
-- Draft SQL segmentation recommendations
+- Reference to the established deterministic SQL audience query (no AI-generated SQL execution)
 - Personalised email content drafts
-- Validation checks and human approval
+- Proposal-level validation checks and human approval/rejection of draft planning materials
 
-AI-generated outputs will require human review before use.
+AI-generated outputs require human review. Approval of a draft does not verify audience eligibility or authorize campaign activation.
 
 ### 5. CRM Performance Measurement
 
@@ -114,7 +114,8 @@ Customer return visits and seller enquiries will be evaluated within a seven-day
 | SQL / SQLite | Relational customer data modelling, audience segmentation and validation |
 | Python | Synthetic data generation, testing and analysis |
 | Brevo | Email marketing and lifecycle journey demonstration |
-| n8n | AI-assisted campaign operations and workflow orchestration |
+| n8n | AI-assisted campaign proposal preparation, validation routing and human review |
+| Ollama / qwen2.5:3b | Local language model for unapproved campaign draft generation |
 | REST APIs / Postman | Integration development and API testing |
 | GitHub | Version control, documentation and portfolio evidence |
 
@@ -122,32 +123,38 @@ Salesforce Marketing Cloud capabilities will be mapped conceptually where releva
 
 ## Project Status
 
-**Current phase: Data Preparation, SQL Segmentation & Validation**
+**Current phase:** Phase 05 — AI-assisted campaign operations and documentation (prototype implemented; evidence packaging ongoing).
 
-The business requirements and MVP journey have been approved. Implementation is progressing through data modelling, synthetic data preparation and SQL-based audience segmentation.
+The SQL baseline, Brevo editor test and n8n human draft-review workflow have been demonstrated. The components are **not** an integrated, live campaign-delivery system.
 
 ### Implementation Progress
 
-| ID | Activity | Status |
+| ID | Activity | Current evidence-based status |
 |---|---|---|
-| T01 | Business Case & Assumptions | Completed and approved |
-| T02 | MVP Journey Specification | Completed and approved |
-| T03 | Repository & Documentation | Established; documentation updates in progress |
-| T04 | CRM Data Model | Schema created; formal verification pending |
-| T05 | Synthetic Customer Data | Initial six records created; expansion to 50–100 customers pending |
-| T06 | SQLite Environment | Configured and tested locally |
-| T07 | SQL Audience Segmentation | Initial query drafted; execution and validation pending |
+| T01–T03 | Business case, journey requirements and repository | Completed |
+| T04–T06 | SQLite schema, 80 synthetic customers and local environment | Completed |
+| T07–T09 | Deterministic audience query, 13 SQL checks and synthetic export | Completed; 35 eligible synthetic records at fixed reference time |
+| T10–T13 | Brevo test journey, attributes, personalised editor email | Configured; editor test email delivered; live journey execution not tested |
+| T14 | Agent design, inputs/outputs and guardrails | Documented |
+| T15 | n8n structured campaign request | Tested |
+| T16 | Local Ollama AI draft campaign proposal | Tested; existing `sql/audience.sql` referenced rather than model SQL executed |
+| T17 | JavaScript proposal validation and routing | Demonstrated at proposal level; customer-by-customer eligibility not integrated |
+| T18 | Human draft review | Approve Draft and Reject Draft paths tested; revision path not demonstrated |
 
-### Next Implementation Steps
+### Implementation boundaries
 
-1. Finalise repository documentation and verify the CRM data model.
-2. Expand the synthetic dataset to 50–100 customers covering eligibility, consent and data-quality scenarios.
-3. Execute and validate SQL audience segmentation.
-4. Implement exclusion and deduplication tests.
-5. Prepare an eligible audience export.
-6. Configure the Brevo re-engagement journey.
-7. Develop and test the n8n AI campaign assistant.
-8. Document results, limitations and implementation evidence.
+- SQL eligibility logic is implemented and tested separately, not executed by the n8n agent.
+- The Brevo journey remains inactive. An editor test email is **not** proof of live journey execution.
+- Human draft approval does **not** set `audience_eligibility_verified`, `campaign_approved` or `campaign_sent` to true.
+- No automatic SQL execution, live campaign sending, dynamic MCP brand-context integration or production CRM integration is claimed.
+- Evidence screenshots and a sanitized n8n workflow export still need to be committed.
+
+### Next Steps
+
+1. Add sanitized n8n workflow JSON and screenshots for T15–T18.
+2. Verify the proposal-validation failure branch with explicit negative tests.
+3. Consider a REQUEST_REVISION branch and future deterministic SQL-to-n8n integration.
+4. Refresh portfolio evidence and review the project as an interview-ready case study.
 
 ## Documentation
 
@@ -155,15 +162,11 @@ The business requirements and MVP journey have been approved. Implementation is 
 - [Assumptions & Approval Record](docs/business-case/assumptions-and-approval.md)
 - [Business Discovery & Requirements](docs/discovery-and-requirements.md)
 - [MVP Journey Specification](docs/journey-specification.md)
+- [CRM Data Model](docs/data-model.md)
 - [Local SQLite Setup](docs/setup.md)
-- ## Phase 04 — CRM Journey Automation (Completed)
-
-Implemented a saved-search re-engagement workflow in Brevo with email subscription checks, CRM attribute personalisation and controlled test delivery.
-
-- [Implementation and test results](docs/brevo-journey-implementation.md)
-- [Workflow and test evidence](docs/evidence/phase-04/)
-
-The workflow remains inactive. SQL eligibility and frequency controls are implemented separately and are not yet integrated with Brevo.
+- [Implementation Decisions & Limitations](docs/implementation-decisions-and-limitations.md)
+- [Phase 04 — Brevo Journey Implementation](docs/brevo-journey-implementation.md)
+- [Phase 05 — AI Agent Specification & Tested Human Review](docs/agent_spec.md)
 
 ## Project Governance & Data Privacy
 
