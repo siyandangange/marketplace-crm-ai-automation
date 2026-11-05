@@ -163,3 +163,13 @@ The SQLite audience query (`sql/audience.sql`) is the reference for deterministi
 
 **Next evidence step:** Export the n8n workflow JSON without credentials or secrets and add screenshots for form, validation, approval and rejection to the repository. A revision branch and true audience verification are follow-up enhancements, not prerequisites for documenting this limited prototype.
 
+
+
+### Phase 05 visual evidence
+
+- [Complete AI campaign workflow](evidence/phase-05/ai-campaign-workflow-overview.png) — n8n workflow structure, including validation and human-review branches.
+- [Draft approval result](evidence/phase-05/Draft%20approved.png) — successful **Approve Draft** test; approval is for planning only.
+- [Draft rejection result](evidence/phase-05/Draft%20rejected.png) — successful **Reject Draft** test; no campaign activation.
+- [Sanitized n8n workflow export](../workflows/autoconnect-ai-campaign-operations-assistant.sanitized.json) — inspectable workflow configuration with credential references and instance identifiers removed.
+
+These screenshots document prototype behavior, not a live marketing send or independently verified audience eligibility.
